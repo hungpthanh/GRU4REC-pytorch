@@ -20,7 +20,6 @@ class GRU4REC(nn.Module):
         self.tanh = nn.Tanh()
         self = self.to(self.device)
 
-
     def forward(self, input, hidden):
         '''
         Args:

@@ -20,7 +20,7 @@ parser.add_argument('--eps', default=1e-6, type=float)
 parser.add_argument('--loss_type', default='TOP1', type=str)
 
 # etc
-parser.add_argument('--n_epochs', default=5, type=int)
+parser.add_argument('--n_epochs', default=10, type=int)
 parser.add_argument('--time_sort', default=False, type=bool)
 parser.add_argument('--model_name', default='GRU4REC', type=str)
 parser.add_argument('--save_dir', default='models', type=str)
@@ -32,7 +32,7 @@ args.cuda = torch.cuda.is_available()
 
 def main():
     train_data = lib.Dataset('data/preprocessed_data/rsc15_train_full.txt')
-    valid_data = lib.Dataset('data/preprocessed_data/rsc15_test.txt')
+    valid_data = lib.Dataset('data/preprocessed_data/rsc15_test.txt', itemmap=train_data.itemmap)
     test_data = lib.Dataset('data/preprocessed_data/rsc15_test.txt')
 
     input_size = len(train_data.items)

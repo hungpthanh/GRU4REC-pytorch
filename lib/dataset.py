@@ -4,7 +4,7 @@ import torch
 
 
 class Dataset(object):
-    def __init__(self, path, sep='\t', session_key='SessionID', item_key='ItemId', time_key='timestamp', n_sample=-1, itemstamp=None, time_sort=False):
+    def __init__(self, path, sep='\t', session_key='SessionID', item_key='ItemId', time_key='timestamp', n_sample=-1, itemmap=None, itemstamp=None, time_sort=False):
         # Read csv
         self.df = pd.read_csv(path, sep=sep, names=[session_key, item_key, time_key])
         self.session_key = session_key
@@ -15,7 +15,7 @@ class Dataset(object):
             self.df = self.df[:n_sample]
 
         # Add colummn item index to data
-        self.add_item_indices(itemstamp)
+        self.add_item_indices(itemmap=itemmap)
 
         """
         Sort the df by time, and then by session ID. That is, df is sorted by session ID and
