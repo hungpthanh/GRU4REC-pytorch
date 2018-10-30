@@ -18,7 +18,7 @@ def get_recall(indices, targets):
     if len(hits) == 0:
         return 0
     n_hits = (targets == indices).nonzero()[:, :-1].size(0)
-    recall = n_hits / targets.size(0)
+    recall = float(n_hits) / targets.size(0)
     return recall
 
 
