@@ -52,6 +52,7 @@ if args.cuda:
 
 
 def make_checkpoint_dir():
+    print("PARAMETER" + "-"*10)
     now = datetime.datetime.now()
     S = '{:02d}{:02d}{:02d}{:02d}'.format(now.month, now.day, now.hour, now.minute)
     save_dir = os.path.join(args.checkpoint_dir, S)
@@ -68,12 +69,13 @@ def make_checkpoint_dir():
             print("{}={}".format(attr.upper(), value))
             f.write("{}={}\n".format(attr.upper(), value))
 
+    print("---------" + "-"*10)
+
 
 def main():
-    print("eval = {}".format(args.is_eval))
     print("Loading train data from {}".format(os.path.join(args.data_folder, args.train_data)))
     print("Loading valid data from {}".format(os.path.join(args.data_folder, args.valid_data)))
-    print("Loading test data from {}".format(os.path.join(args.data_folder, args.test_data)))
+    print("Loading test data from {}\n".format(os.path.join(args.data_folder, args.test_data)))
 
     train_data = lib.Dataset(os.path.join(args.data_folder, args.train_data))
     valid_data = lib.Dataset(os.path.join(args.data_folder, args.valid_data), itemmap=train_data.itemmap)
@@ -142,14 +144,12 @@ def main():
 
         trainer.train(0, n_epochs)
     else:
-        print("PASSSSSSSSSS")
         if args.load_model is not None:
             print("Loading pretrain model from {}".format(args.load_model))
             checkpoint = torch.load(args.load_model)
             model = checkpoint["model"]
             model.gru.flatten_parameters()
             optim = checkpoint["optim"]
-            print("Test model in cuda: {}".format(next(model.parameters()).is_cuda))
             loss_function = lib.LossFunction(loss_type=loss_type, use_cuda=args.cuda)
             evaluation = lib.Evaluation(model, loss_function, use_cuda=args.cuda)
             loss, recall, mrr = evaluation.eval(valid_data)
