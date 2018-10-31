@@ -2,6 +2,7 @@ import lib
 import numpy as np
 import torch
 
+
 class Evaluation(object):
     def __init__(self, model, loss_func, use_cuda, k=20):
         self.model = model
@@ -21,15 +22,8 @@ class Evaluation(object):
                 input = input.to(self.device)
                 target = target.to(self.device)
                 logit, hidden = self.model(input, hidden)
-                # print("type of logit: {}".format(type(logit)))
-                # output sampling
                 logit_sampled = logit[:, target.view(-1)]
-                # print("type of logit: {}".format(type(logit)))
                 loss = self.loss_func(logit_sampled)
-                # print("type of target: {}".format(type(target)))
-                # print("target size: {}".format(target.size()))
-                # print("type of logit final: {}".format(type(logit)))
-                # print("logit size: {}".format(logit.size()))
                 recall, mrr = lib.evaluate(logit, target, k=self.topk)
 
                 # torch.Tensor.item() to get a Python number from a tensor containing a single value

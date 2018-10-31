@@ -37,7 +37,7 @@ class Trainer(object):
                 'recall': recall,
                 'mrr': mrr
             }
-            model_name = os.path.join(self.args.save_dir, "model_%d.pt" % epoch)
+            model_name = os.path.join(self.args.checkpoint_dir, "model_{0:05d}.pt".format(epoch))
             torch.save(checkpoint, model_name)
             print("Save model as %s" % model_name)
 
@@ -45,15 +45,13 @@ class Trainer(object):
     def train_epoch(self, epoch):
         self.model.train()
         losses = []
-        recalls = []
-        mrrs = []
 
         def reset_hidden(hidden, mask):
             """Helper function that resets hidden state when some sessions terminate"""
             if len(mask) != 0:
                 hidden[:, mask, :] = 0
-
             return hidden
+
         hidden = self.model.init_hidden()
         dataloader = lib.DataLoader(self.train_data)
         for input, target, mask in dataloader:
@@ -64,15 +62,7 @@ class Trainer(object):
             logit, hidden = self.model(input, hidden)
             # output sampling
             logit_sampled = logit[:, target.view(-1)]
-
-
             loss = self.loss_func(logit_sampled)
-
-            # torch.Tensor.item() to get a Python number from a tensor containing a single value
-            # if self.clip_grad != -1:
-            #     for p in self.gru.parameters():
-            #         p.grad.data.clamp_(max=self.clip_grad)
-
             losses.append(loss.item())
             loss.backward()
             self.optim.step()

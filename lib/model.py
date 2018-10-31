@@ -3,7 +3,7 @@ import torch
 
 class GRU4REC(nn.Module):
     def __init__(self, input_size, hidden_size, output_size, num_layers=1,
-                 dropout_hidden=.5, dropout_input=0, batch_size=50, use_cuda=False):
+                 dropout_hidden=.5, dropout_input=0, batch_size=50, embedding_dim=-1, use_cuda=False):
         super(GRU4REC, self).__init__()
         self.input_size = input_size
         self.hidden_size = hidden_size
@@ -11,14 +11,20 @@ class GRU4REC(nn.Module):
         self.num_layers = num_layers
         self.dropout_hidden = dropout_hidden
         self.dropout_input = dropout_input
+        self.embedding_dim = embedding_dim
         self.batch_size = batch_size
         self.use_cuda = use_cuda
         self.device = torch.device('cuda' if use_cuda else 'cpu')
-        self.gru = nn.GRU(self.input_size, self.hidden_size, self.num_layers, dropout=self.dropout_hidden)
         self.onehot_buffer = self.init_emb()
         self.h2o = nn.Linear(hidden_size, output_size)
         self.tanh = nn.Tanh()
+        if self.embedding_dim != -1:
+            self.look_up = nn.Embedding(input_size, self.embedding_dim)
+            self.gru = nn.GRU(self.embedding_dim, self.hidden_size, self.num_layers, dropout=self.dropout_hidden)
+        else:
+            self.gru = nn.GRU(self.input_size, self.hidden_size, self.num_layers, dropout=self.dropout_hidden)
         self = self.to(self.device)
+
 
     def forward(self, input, hidden):
         '''
@@ -31,9 +37,13 @@ class GRU4REC(nn.Module):
             hidden: GRU hidden state
         '''
 
-        embedded = self.onehot_encode(input)
-        if self.training and self.dropout_input > 0: embedded = self.embedding_dropout(embedded)
-        embedded = embedded.unsqueeze(0)
+        if self.embedding_dim == -1:
+            embedded = self.onehot_encode(input)
+            if self.training and self.dropout_input > 0: embedded = self.embedding_dropout(embedded)
+            embedded = embedded.unsqueeze(0)
+        else:
+            embedded = input.unsqueeze(0)
+            embedded = self.look_up(embedded)
 
         output, hdden = self.gru(embedded, hidden) # (num_layer, B, H)
         output = output.view(-1, output.size(-1))  # (B,H)
