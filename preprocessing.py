@@ -10,9 +10,9 @@ import pandas as pd
 import datetime as dt
 
 PATH_TO_ORIGINAL_DATA = 'data/raw_data/'
-PATH_TO_PROCESSED_DATA = 'data/preprocessed_data/'
+PATH_TO_PROCESSED_DATA = 'data/test_data/'
 
-data = pd.read_csv(PATH_TO_ORIGINAL_DATA + 'yoochoose-clicks-small.dat', sep=',', header=None, usecols=[0, 1, 2], dtype={0:np.int32, 1:str, 2:np.int64})
+data = pd.read_csv(PATH_TO_ORIGINAL_DATA + 'yoochoose-clicks-super-small.dat', sep=',', header=None, usecols=[0, 1, 2], dtype={0:np.int32, 1:str, 2:np.int64})
 data.columns = ['SessionId', 'TimeStr', 'ItemId']
 data['Time'] = data.TimeStr.apply(lambda x: dt.datetime.strptime(x, '%Y-%m-%dT%H:%M:%S.%fZ').timestamp()) #This is not UTC. It does not really matter.
 del(data['TimeStr'])
@@ -24,12 +24,34 @@ data = data[np.in1d(data.ItemId, item_supports[item_supports>=5].index)]
 session_lengths = data.groupby('SessionId').size()
 data = data[np.in1d(data.SessionId, session_lengths[session_lengths>=2].index)]
 
+print(data)
+
 tmax = data.Time.max()
 session_max_times = data.groupby('SessionId').Time.max()
+print("session_max_times")
+print(session_max_times)
+print(type(session_max_times))
+print(session_max_times.size)
+print(session_max_times.index[-1]) # get index in pandas.Series
+print(session_max_times.sort_values())
+print(type(session_max_times.sort_values()))
+print(session_max_times.sort_values())
+# Index cua cac session lam train
 session_train = session_max_times[session_max_times < tmax-86400].index
+
+print(session_train)
+# Index cua cac session lam test
 session_test = session_max_times[session_max_times >= tmax-86400].index
 train = data[np.in1d(data.SessionId, session_train)]
 test = data[np.in1d(data.SessionId, session_test)]
+
+
+print("test item")
+print(test.ItemId)
+
+print("train item")
+print(train.ItemId)
+
 test = test[np.in1d(test.ItemId, train.ItemId)]
 tslength = test.groupby('SessionId').size()
 test = test[np.in1d(test.SessionId, tslength[tslength>=2].index)]
