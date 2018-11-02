@@ -21,7 +21,7 @@ parser.add_argument('--eps', default=1e-6, type=float)
 parser.add_argument("-seed", type=int, default=7,
                      help="Seed for random initialization")
 parser.add_argument("-sigma", type=float, default=None,
-                     help="init weight")
+                     help="init weight -1: range [-sigma, sigma], -2: range [0, sigma]")
 parser.add_argument("--embedding_dim", type=int, default=300,
                      help="using embedding")
 # parse the loss type
@@ -113,6 +113,9 @@ def main():
                             embedding_dim=embedding_dim
                             )
 
+        # init weight
+        # See Balazs Hihasi(ICLR 2016), pg.7
+
         if args.sigma is not None:
             for p in model.parameters():
                 if args.sigma != -1 and args.sigma != -2:
@@ -142,10 +145,10 @@ def main():
                               loss_func=loss_function,
                               args=args)
 
-        trainer.train(0, n_epochs)
+        trainer.train(0, n_epochs - 1)
     else:
         if args.load_model is not None:
-            print("Loading pretrain model from {}".format(args.load_model))
+            print("Loading pre trained model from {}".format(args.load_model))
             checkpoint = torch.load(args.load_model)
             model = checkpoint["model"]
             model.gru.flatten_parameters()
@@ -155,7 +158,7 @@ def main():
             loss, recall, mrr = evaluation.eval(valid_data)
             print("Final result: recall = {:.2f}, mrr = {:.2f}".format(recall, mrr))
         else:
-            print("Pretrain model is None!")
+            print("Pre trained model is None!")
 
 
 if __name__ == '__main__':
