@@ -9,10 +9,10 @@ import numpy as np
 import pandas as pd
 import datetime as dt
 
-ADD_TEN_PERCENT = True
+ADD_TEN_PERCENT = False
 
 PATH_TO_ORIGINAL_DATA = 'data/raw_data/'
-PATH_TO_PROCESSED_DATA = 'data/test_data/'
+PATH_TO_PROCESSED_DATA = 'data/preprocessed_data/'
 
 data = pd.read_csv(PATH_TO_ORIGINAL_DATA + 'yoochoose-clicks-small.dat', sep=',', header=None, usecols=[0, 1, 2], dtype={0:np.int32, 1:str, 2:np.int64})
 data.columns = ['SessionId', 'TimeStr', 'ItemId']
@@ -39,14 +39,14 @@ session_train = session_max_times[session_max_times < tmax-86400].index
 session_test = session_max_times[session_max_times >= tmax-86400].index
 train = data[np.in1d(data.SessionId, session_train)]
 test = data[np.in1d(data.SessionId, session_test)]
-
+print('train set\n\tEvents: {}\n\tSessions: {}\n\tItems: {}'.format(len(train), train.SessionId.nunique(), train.ItemId.nunique()))
 if ADD_TEN_PERCENT:
     # tmax = train.Time.max()
     # tmin = train.Time.min()
 
     session_max_times = train.groupby('SessionId').Time.max()
     Size = session_max_times.size
-    tt = Size // 10
+    tt = Size * 20 // 100
     time = session_max_times.sort_values().data[-tt]
     session_add = session_max_times[session_max_times >= time].index
     sub_train = train[np.in1d(train.SessionId, session_add)].copy()
@@ -54,7 +54,8 @@ if ADD_TEN_PERCENT:
     session_max_of_train = train.SessionId.max()
 
     sub_train['SessionId'] = sub_train.SessionId.apply(lambda x: x - session_min + session_max_of_train + 1)
-
+    print('add train set\n\tEvents: {}\n\tSessions: {}\n\tItems: {}'.format(len(sub_train), sub_train.SessionId.nunique(),
+                                                                            sub_train.ItemId.nunique()))
     train = pd.concat([train, sub_train])
 
 

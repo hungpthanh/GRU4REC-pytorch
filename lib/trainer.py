@@ -23,11 +23,12 @@ class Trainer(object):
             self.start_time = start_time
 
         for epoch in range(start_epoch, end_epoch + 1):
-
+            st = time.time()
             train_loss = self.train_epoch(epoch)
             loss, recall, mrr = self.evaluation.eval(self.eval_data)
 
-            print("Epoch: {}, loss: {:.2f}, recall: {:.2f}, mrr: {:.2f}".format(epoch, loss, recall, mrr))
+
+            print("Epoch: {}, loss: {:.2f}, recall: {:.2f}, mrr: {:.2f}, time: {}".format(epoch, loss, recall, mrr, time.time() - st))
             checkpoint = {
                 'model': self.model,
                 'args': self.args,

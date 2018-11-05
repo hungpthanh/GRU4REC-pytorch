@@ -22,7 +22,7 @@ parser.add_argument("-seed", type=int, default=7,
                      help="Seed for random initialization")
 parser.add_argument("-sigma", type=float, default=None,
                      help="init weight -1: range [-sigma, sigma], -2: range [0, sigma]")
-parser.add_argument("--embedding_dim", type=int, default=300,
+parser.add_argument("--embedding_dim", type=int, default=-1,
                      help="using embedding")
 # parse the loss type
 parser.add_argument('--loss_type', default='TOP1', type=str)
