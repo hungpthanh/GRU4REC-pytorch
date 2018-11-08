@@ -14,10 +14,12 @@ parser.add_argument('--dropout_hidden', default=.5, type=float)
 
 # parse the optimizer arguments
 parser.add_argument('--optimizer_type', default='Adagrad', type=str)
+parser.add_argument('--final_act', default='tanh', type=str)
 parser.add_argument('--lr', default=.01, type=float)
 parser.add_argument('--weight_decay', default=0, type=float)
 parser.add_argument('--momentum', default=0, type=float)
 parser.add_argument('--eps', default=1e-6, type=float)
+
 parser.add_argument("-seed", type=int, default=7,
                      help="Seed for random initialization")
 parser.add_argument("-sigma", type=float, default=None,
@@ -72,6 +74,20 @@ def make_checkpoint_dir():
     print("---------" + "-"*10)
 
 
+def init_model(model):
+    if args.sigma is not None:
+        for p in model.parameters():
+            if args.sigma != -1 and args.sigma != -2:
+                sigma = args.sigma
+                p.data.uniform_(-sigma, sigma)
+            elif len(list(p.size())) > 1:
+                sigma = np.sqrt(6.0 / (p.size(0) + p.size(1)))
+                if args.sigma == -1:
+                    p.data.uniform_(-sigma, sigma)
+                else:
+                    p.data.uniform_(0, sigma)
+
+
 def main():
     print("Loading train data from {}".format(os.path.join(args.data_folder, args.train_data)))
     print("Loading valid data from {}".format(os.path.join(args.data_folder, args.valid_data)))
@@ -92,6 +108,7 @@ def main():
     dropout_input = args.dropout_input
     dropout_hidden = args.dropout_hidden
     embedding_dim = args.embedding_dim
+    final_act = args.final_act
     loss_type = args.loss_type
 
     optimizer_type = args.optimizer_type
@@ -105,6 +122,7 @@ def main():
 
     if not args.is_eval:
         model = lib.GRU4REC(input_size, hidden_size, output_size,
+                            final_act=final_act,
                             num_layers=num_layers,
                             use_cuda=args.cuda,
                             batch_size=batch_size,
@@ -116,17 +134,7 @@ def main():
         # init weight
         # See Balazs Hihasi(ICLR 2016), pg.7
 
-        if args.sigma is not None:
-            for p in model.parameters():
-                if args.sigma != -1 and args.sigma != -2:
-                    sigma = args.sigma
-                    p.data.uniform_(-sigma, sigma)
-                elif len(list(p.size())) > 1:
-                    sigma = np.sqrt(6.0 / (p.size(0) + p.size(1)))
-                    if args.sigma == -1:
-                        p.data.uniform_(-sigma, sigma)
-                    else:
-                        p.data.uniform_(0, sigma)
+        init_model(model)
 
         optimizer = lib.Optimizer(model.parameters(),
                                   optimizer_type=optimizer_type,
