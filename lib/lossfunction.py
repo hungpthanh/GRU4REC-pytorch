@@ -73,6 +73,9 @@ class BPRLoss(nn.Module):
 
 class BPR_max(nn.Module):
     def __init__(self):
+        """
+        See https://arxiv.org/pdf/1706.03847.pdf, formula (12)
+        """
         super(BPR_max, self).__init__()
 
     def forward(self, logit):
@@ -105,7 +108,11 @@ class TOP1Loss(nn.Module):
 
 
 class TOP1_max(nn.Module):
+
     def __init__(self):
+        """
+        See https://arxiv.org/pdf/1706.03847.pdf, formula (9)
+        """
         super(TOP1_max, self).__init__()
 
     def forward(self, logit):
