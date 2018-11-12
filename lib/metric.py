@@ -32,14 +32,9 @@ def get_mrr(indices, targets):
     Returns:
         mrr (float): the mrr score
     """
-    # print(targets.size())
+
     tmp = targets.view(-1, 1)
-    # print("tmp size")
-    # print(tmp.size())
-    # print("indicies type: {}".format(type(indices)))
-    # print(indices.size())
     targets = tmp.expand_as(indices)
-    # targets = targets.view(-1, 1).expand(indices)
     hits = (targets == indices).nonzero()
     ranks = hits[:, -1] + 1
     ranks = ranks.float()
@@ -61,7 +56,6 @@ def evaluate(indices, targets, k=20):
         mrr (float): the mrr score
     """
     _, indices = torch.topk(indices, k, -1)
-    # print("type of indices after topk: {}".format(type(indices)))
     recall = get_recall(indices, targets)
     mrr = get_mrr(indices, targets)
     return recall, mrr

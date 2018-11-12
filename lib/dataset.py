@@ -120,17 +120,8 @@ class DataLoader():
 
         iters = np.arange(self.batch_size)
         maxiter = iters.max()
-        # print("session_idx_arr")
-        # print(session_idx_arr[iters])
-        # print(session_idx_arr[iters] + 1)
         start = click_offsets[session_idx_arr[iters]]
         end = click_offsets[session_idx_arr[iters] + 1]
-
-        # print(type(start))
-        # print(start.shape)
-        # print(type(end))
-        # print(end.shape)
-
         mask = []  # indicator for the sessions to be terminated
         finished = False
 
@@ -138,16 +129,11 @@ class DataLoader():
             minlen = (end - start).min()
             # Item indices(for embedding) for clicks where the first sessions start
             idx_target = df.item_idx.values[start]
-            # print("minlen = {}".format(minlen))
-            # print("type id_targer: {}".format(type(idx_target)))
-            # print(idx_target)
+
             for i in range(minlen - 1):
-                # print("i = {}".format(i))
                 # Build inputs & targets
                 idx_input = idx_target
-                # print(idx_input)
                 idx_target = df.item_idx.values[start + i + 1]
-                # print(idx_target)
                 input = torch.LongTensor(idx_input)
                 target = torch.LongTensor(idx_target)
                 yield input, target, mask
@@ -155,11 +141,7 @@ class DataLoader():
             # click indices where a particular session meets second-to-last element
             start = start + (minlen - 1)
             # see if how many sessions should terminate
-            # print("jdksjda")
-            # print((end - start) <= 1)
             mask = np.arange(len(iters))[(end - start) <= 1]
-            # print("mark = ")
-            # print(mask)
             for idx in mask:
                 maxiter += 1
                 if maxiter >= len(click_offsets) - 1:

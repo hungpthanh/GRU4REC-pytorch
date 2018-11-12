@@ -41,9 +41,6 @@ train = data[np.in1d(data.SessionId, session_train)]
 test = data[np.in1d(data.SessionId, session_test)]
 print('train set\n\tEvents: {}\n\tSessions: {}\n\tItems: {}'.format(len(train), train.SessionId.nunique(), train.ItemId.nunique()))
 if ADD_TEN_PERCENT:
-    # tmax = train.Time.max()
-    # tmin = train.Time.min()
-
     session_max_times = train.groupby('SessionId').Time.max()
     Size = session_max_times.size
     tt = Size * 20 // 100
@@ -52,12 +49,10 @@ if ADD_TEN_PERCENT:
     sub_train = train[np.in1d(train.SessionId, session_add)].copy()
     session_min = sub_train.SessionId.min()
     session_max_of_train = train.SessionId.max()
-
     sub_train['SessionId'] = sub_train.SessionId.apply(lambda x: x - session_min + session_max_of_train + 1)
     print('add train set\n\tEvents: {}\n\tSessions: {}\n\tItems: {}'.format(len(sub_train), sub_train.SessionId.nunique(),
                                                                             sub_train.ItemId.nunique()))
     train = pd.concat([train, sub_train])
-
 
 test = test[np.in1d(test.ItemId, train.ItemId)]
 tslength = test.groupby('SessionId').size()
@@ -66,8 +61,6 @@ print('Full train set\n\tEvents: {}\n\tSessions: {}\n\tItems: {}'.format(len(tra
 train.to_csv(PATH_TO_PROCESSED_DATA + 'rsc15_train_full.txt', sep='\t', header=False, index=False)
 print('Test set\n\tEvents: {}\n\tSessions: {}\n\tItems: {}'.format(len(test), test.SessionId.nunique(), test.ItemId.nunique()))
 test.to_csv(PATH_TO_PROCESSED_DATA + 'rsc15_test.txt', sep='\t', header=False, index=False)
-
-
 
 # =================================================================================
 
