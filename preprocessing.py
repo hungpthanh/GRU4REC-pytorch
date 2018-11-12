@@ -32,10 +32,10 @@ tmin = data.Time.min()
 
 session_max_times = data.groupby('SessionId').Time.max()
 
-# Index cua cac session lam train
+# Index of train session
 session_train = session_max_times[session_max_times < tmax-86400].index
 
-# Index cua cac session lam test
+# Index of test session
 session_test = session_max_times[session_max_times >= tmax-86400].index
 train = data[np.in1d(data.SessionId, session_train)]
 test = data[np.in1d(data.SessionId, session_test)]
