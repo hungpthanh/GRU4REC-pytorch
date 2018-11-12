@@ -37,7 +37,6 @@ class GRU4REC(nn.Module):
         elif final_act == 'softmax_logit':
             self.final_activation = nn.LogSoftmax()
         elif final_act.startswith('elu-'):
-            print("Pass elu")
             self.final_activation = nn.ELU(alpha=float(final_act.split('-')[1]))
         elif final_act.startswith('leaky-'):
             self.final_activation = nn.LeakyReLU(negative_slope=float(final_act.split('-')[1]))

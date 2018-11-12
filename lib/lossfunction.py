@@ -16,6 +16,10 @@ class LossFunction(nn.Module):
             self._loss_fn = TOP1Loss()
         elif loss_type == 'BPR':
             self._loss_fn = BPRLoss()
+        elif loss_type == 'TOP1-max':
+            self._loss_fn = TOP1_max()
+        elif loss_type == 'BPR-max':
+            self._loss_fn = BPR_max()
         else:
             raise NotImplementedError
 
@@ -67,6 +71,17 @@ class BPRLoss(nn.Module):
         return loss
 
 
+class BPR_max(nn.Module):
+    def __init__(self):
+        super(BPR_max, self).__init__()
+
+    def forward(self, logit):
+        logit_softmax = F.softmax(logit, dim=1)
+        diff = logit.diag().view(-1, 1).expand_as(logit) - logit
+        loss = -torch.log(torch.mean(logit_softmax * torch.sigmoid(diff)))
+        return loss
+
+
 class TOP1Loss(nn.Module):
     def __init__(self):
         """
@@ -86,4 +101,16 @@ class TOP1Loss(nn.Module):
         # final loss
         loss = torch.sigmoid(diff).mean() + torch.sigmoid(logit ** 2).mean()
 
+        return loss
+
+
+class TOP1_max(nn.Module):
+    def __init__(self):
+        super(TOP1_max, self).__init__()
+
+    def forward(self, logit):
+        logit_softmax = F.softmax(logit, dim=1)
+
+        diff = -(logit.diag().view(-1, 1).expand_as(logit) - logit)
+        loss = torch.mean(logit_softmax * (torch.sigmoid(diff) + torch.sigmoid(logit ** 2)))
         return loss
