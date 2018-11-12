@@ -5,7 +5,7 @@
 - In this version, I added TOP1-max, BPR-max, restruct project, init weight and load model to evaluate.
 
 ## Requirements
-- Pytorch 0.4.1
+- PyTorch 0.4.1
 - Python 3.5
 - pandas
 - numpy 1.14.5
