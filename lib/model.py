@@ -62,7 +62,7 @@ class GRU4REC(nn.Module):
             embedded = input.unsqueeze(0)
             embedded = self.look_up(embedded)
 
-        output, hdden = self.gru(embedded, hidden) # (num_layer, B, H)
+        output, hidden = self.gru(embedded, hidden) # (num_layer, B, H)
         output = output.view(-1, output.size(-1))  # (B,H)
         logit = self.final_activation(self.h2o(output))
 
