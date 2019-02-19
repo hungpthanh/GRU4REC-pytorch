@@ -2,7 +2,7 @@
 - PyTorch Implementation of the GRU4REC model.
 - Original paper: [Session-based Recommendations with Recurrent Neural Networks(ICLR 2016)](https://arxiv.org/pdf/1511.06939.pdf)
 - This code is based on [pyGRU4REC](https://github.com/yhs-968/pyGRU4REC) that is implemented by Younghun Song (yhs-968) and [original Theano code written by the authors of the GRU4REC paper](https://github.com/hidasib/GRU4Rec)
-- In this version, I added TOP1-max, BPR-max, restruct project, init weight and load model to evaluate.
+- In this version, I added TOP1-max, BPR-max, restructure project, init weight and load model to evaluate.
 
 ## Requirements
 - PyTorch 0.4.1
