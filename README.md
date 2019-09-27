@@ -41,10 +41,14 @@ The project have a structure as below:
 │   │    ├── preprocessed_data
 │   │    │    ├── recSys15TrainOnly.txt
 │   │    │    ├── recSys15Valid.txt
+│   │    ├── raw_data
+│   │    │    ├── yoochoose-clicks.dat
 │   ├── lib
 │   ├── main.py
 │   ├── preprocessing.py
+│   ├── tool.py
 ```
+`tool.py` can be used to get 1/8 last session from `yoochoose-clicks.dat`
 
 In GRU4REC-pytorch
 
