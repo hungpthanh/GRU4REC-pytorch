@@ -20,10 +20,10 @@ Recommendations(CIKM 2018)](https://arxiv.org/abs/1706.03847)
 
 The format of data is similar to that obtained from RecSys Challenge 2015:
 - Filenames
-    - Training set should be named as `rsc15_train_full.txt`
-    - Test set should be named as `rsc15_test.txt`
+    - Training set should be named as `recSys15TrainOnly.txt`
+    - Test set should be named as `recSys15Valid.txt`
 - Contents
-    - `rsc15_train_full.txt`, `rsc15_test.txt` should be the tsv files that stores the pandas dataframes that satisfy the following requirements:
+    - `recSys15TrainOnly.txt`, `recSys15Valid.txt` should be the tsv files that stores the pandas dataframes that satisfy the following requirements:
         - The 1st column of the file should be the integer Session IDs with header name SessionID
         - The 2nd column of the file should be the integer Item IDs with header name ItemID
         - The 3rd column of the file should be the Timestamps with header name Time
