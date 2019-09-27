@@ -90,7 +90,6 @@ def main():
 
     train_data = lib.Dataset(os.path.join(args.data_folder, args.train_data))
     valid_data = lib.Dataset(os.path.join(args.data_folder, args.valid_data), itemmap=train_data.itemmap)
-    test_data = lib.Dataset(os.path.join(args.data_folder, args.test_data))
     make_checkpoint_dir()
         
     #set all the parameters according to the defined arguments
