@@ -14,6 +14,9 @@ Recommendations(CIKM 2018)](https://arxiv.org/abs/1706.03847)
 
 ## Usage
 
+### Dataset
+RecSys Challenge 2015 Dataset can be retreived from [HERE](https://2015.recsyschallenge.com/)
+
 ### Pre processing data
 - You need to run preprocessing.py to obtain training data and testing data. In the paper, only the training set was used, the testing set is ignored.
 - The training set itself is divided into training and testing where the testing split is the last day sessions.
