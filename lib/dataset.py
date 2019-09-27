@@ -4,9 +4,9 @@ import torch
 
 
 class Dataset(object):
-    def __init__(self, path, sep='\t', session_key='SessionID', item_key='ItemId', time_key='timestamp', n_sample=-1, itemmap=None, itemstamp=None, time_sort=False):
+    def __init__(self, path, sep=',', session_key='SessionID', item_key='ItemID', time_key='Time', n_sample=-1, itemmap=None, itemstamp=None, time_sort=False):
         # Read csv
-        self.df = pd.read_csv(path, sep=sep, names=[session_key, item_key, time_key])
+        self.df = pd.read_csv(path, sep=sep, dtype={session_key: int, item_key: int, time_key: float})
         self.session_key = session_key
         self.item_key = item_key
         self.time_key = time_key
@@ -16,38 +16,13 @@ class Dataset(object):
 
         # Add colummn item index to data
         self.add_item_indices(itemmap=itemmap)
-
         """
         Sort the df by time, and then by session ID. That is, df is sorted by session ID and
         clicks within a session are next to each other, where the clicks within a session are time-ordered.
-        Example:
-        >>> df = pd.DataFrame({
-        ...     'col1' : ['A', 'A', 'B', np.nan, 'D', 'C'],
-        ...     'col2' : [2, 1, 9, 8, 7, 4],
-        ...     'col3': [0, 1, 9, 4, 2, 3],
-        ... })
-        >>> df
-            col1 col2 col3
-        0   A    2    0
-        1   A    1    1
-        2   B    9    9
-        3   NaN  8    4
-        4   D    7    2
-        5   C    4    3
-        
-        >>> df.sort_values(by=['col1', 'col2'])
-            col1 col2 col3
-        1   A    1    1
-        0   A    2    0
-        2   B    9    9
-        5   C    4    3
-        4   D    7    2
-        3   NaN  8    4
         """
         self.df.sort_values([session_key, time_key], inplace=True)
         self.click_offsets = self.get_click_offset()
         self.session_idx_arr = self.order_session_idx()
-        # print(self.df)
 
     def add_item_indices(self, itemmap=None):
         """
@@ -55,7 +30,6 @@ class Dataset(object):
         Args:
             itemmap (pd.DataFrame): mapping between the item Ids and indices
         """
-
         if itemmap is None:
             item_ids = self.df[self.item_key].unique()  # type is numpy.ndarray
             item2idx = pd.Series(data=np.arange(len(item_ids)),
@@ -64,9 +38,7 @@ class Dataset(object):
             itemmap = pd.DataFrame({self.item_key: item_ids,
                                    'item_idx': item2idx[item_ids].values})
         self.itemmap = itemmap
-        # print(self.df)
         self.df = pd.merge(self.df, self.itemmap, on=self.item_key, how='inner')
-        # print(self.df)
 
     def get_click_offset(self):
         """
@@ -89,7 +61,7 @@ class Dataset(object):
 
     @property
     def items(self):
-        return self.itemmap.ItemId.unique()
+        return self.itemmap[self.item_key].unique()
 
 
 class DataLoader():
@@ -112,7 +84,6 @@ class DataLoader():
             target (B,): a Variable that stores the target item indices
             masks: Numpy array indicating the positions of the sessions to be terminated
         """
-
         # initializations
         df = self.dataset.df
         click_offsets = self.dataset.click_offsets
@@ -151,8 +122,3 @@ class DataLoader():
                 iters[idx] = maxiter
                 start[idx] = click_offsets[session_idx_arr[maxiter]]
                 end[idx] = click_offsets[session_idx_arr[maxiter] + 1]
-
-                
-if __name__ == '__main__':
-    path = '/home/hungthanhpham94/dev/NLP/GRU4REC-pytorch/data/preprocessed_data/rsc15_train_valid.txt'
-    S = Dataset(path)
