@@ -54,6 +54,31 @@ Testing
 ```bash
 python main.py --is_eval --load_model checkpoint/CHECKPOINT#/model_EPOCH#.pt
 ```
+### List of Arguments accepted
+```--hidden_size``` Number of Neurons per Layer (Default = 100) <br>
+```--num_layers``` Number of Hidden Layers (Default = 1) <br>
+```--batch_size``` Batch Size (Default = 50) <br>
+```--dropout_input``` Dropout ratio at input (Default = 0) <br>
+```--dropout_hidden``` Dropout at each hidden layer except the last one (Default = 0.5) <br>
+```--n_epochs``` Number of epochs (Default = 10) <br>
+```--k_eval``` Value of K used durig Recall@K and MRR@K Evaluation (Default = 20) <br>
+```--optimizer_type``` Optimizer (Default = Adagrad) <br>
+```--final_act``` Activation Function (Default = Tanh) <br>
+```--lr``` Learning rate (Default = 0.01) <br>
+```--weight_decay``` Weight decay (Default = 0) <br>
+```--momentum``` Momentum Value (Default = 0)  <br>
+```--eps``` Epsilon Value of Optimizer (Default = 1e-6)  <br>
+```--loss_type``` Type of loss function TOP1 / BPR / TOP1-max / BPR-max / Cross-Entropy (Default: TOP1-max) <br>
+```--time_sort``` In case items are not sorted by time stamp (Default = 0) <br>
+```--model_name``` String of model name. <br>
+```--save_dir```  String of folder to save the checkpoints and logs inside it (Default = /checkpoint).<br>
+```--data_folder``` String of the directory to the folder containing the dataset. <br>
+```--train_data```  Name of the training dataset file (Default = `recSys15TrainOnly.txt`)<br>
+```--valid_data```  Name of the validation dataset file (Default = `recSys15Valid.txt`)<br>
+```--is_eval``` Should be used in case of evaluation only using a checkpoint model. <br>
+```--load_model``` String containing the checkpoint model to be used in evaluation. <br>
+```--checkpoint_dir```  String containing directory of the checkpoints folder. <br>
+
 
 ## Results
 
