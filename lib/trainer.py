@@ -13,7 +13,7 @@ class Trainer(object):
         self.eval_data = eval_data
         self.optim = optim
         self.loss_func = loss_func
-        self.evaluation = lib.Evaluation(self.model, self.loss_func, use_cuda, args.k_eval)
+        self.evaluation = lib.Evaluation(self.model, self.loss_func, use_cuda, k = args.k_eval)
         self.device = torch.device('cuda' if use_cuda else 'cpu')
         self.batch_size = batch_size
         self.args = args

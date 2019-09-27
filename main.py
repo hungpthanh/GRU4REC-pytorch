@@ -7,8 +7,8 @@ import datetime
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--hidden_size', default=100, type=int) #Literature uses 100 / 1000 --> better is 100
-parser.add_argument('--num_layers', default=1, type=int) #1 hidden layer
-parser.add_argument('--batch_size', default=64, type=int) #50 in first paper and 32 in second paper
+parser.add_argument('--num_layers', default=3, type=int) #1 hidden layer
+parser.add_argument('--batch_size', default=50, type=int) #50 in first paper and 32 in second paper
 parser.add_argument('--dropout_input', default=0, type=float) #0.5 for TOP and 0.3 for BPR
 parser.add_argument('--dropout_hidden', default=0.5, type=float) #0.5 for TOP and 0.3 for BPR
 parser.add_argument('--n_epochs', default=5, type=int) #number of epochs (10 in literature)
@@ -137,7 +137,7 @@ def main():
                 checkpoint = torch.load(args.load_model, map_location=lambda storage, loc: storage)
             model = checkpoint["model"]
             model.gru.flatten_parameters()
-            evaluation = lib.Evaluation(model, loss_function, use_cuda=args.cuda, args.k_eval)
+            evaluation = lib.Evaluation(model, loss_function, use_cuda=args.cuda, k = args.k_eval)
             loss, recall, mrr = evaluation.eval(valid_data, batch_size)
             print("Final result: recall = {:.2f}, mrr = {:.2f}".format(recall, mrr))
         else:
