@@ -31,7 +31,7 @@ class Trainer(object):
             loss, recall, mrr = self.evaluation.eval(self.eval_data, self.batch_size)
 
 
-            print("Epoch: {}, Train loss: {:.2f}, loss: {:.2f}, recall: {:.4f}, mrr: {:.4f}, time: {}".format(epoch, train_loss, loss, recall, mrr, time.time() - st))
+            print("Epoch: {}, loss: {:.2f}, recall: {:.2f}, mrr: {:.2f}, time: {}".format(epoch, loss, recall, mrr, time.time() - st))
             checkpoint = {
                 'model': self.model,
                 'args': self.args,
@@ -59,7 +59,7 @@ class Trainer(object):
         hidden = self.model.init_hidden()
         dataloader = lib.DataLoader(self.train_data, self.batch_size)
         #for ii,(data,label) in tqdm(enumerate(train_dataloader),total=len(train_data)):
-        for ii, (input, target, mask) in tqdm(enumerate(dataloader), total=len(dataloader.dataset.df) // self.batch_size, miniters = 1000):
+        for ii, (input, target, mask) in tqdm(enumerate(dataloader), total=len(dataloader.dataset.df) // dataloader.batch_size, miniters = 1000):
             input = input.to(self.device)
             target = target.to(self.device)
             self.optim.zero_grad()
