@@ -1,7 +1,7 @@
 import lib
 import numpy as np
 import torch
-
+from tqdm import tqdm
 
 class Evaluation(object):
     def __init__(self, model, loss_func, use_cuda, k=20):
@@ -10,15 +10,16 @@ class Evaluation(object):
         self.topk = k
         self.device = torch.device('cuda' if use_cuda else 'cpu')
 
-    def eval(self, eval_data):
+    def eval(self, eval_data, batch_size):
         self.model.eval()
         losses = []
         recalls = []
         mrrs = []
-        dataloader = lib.DataLoader(eval_data)
+        dataloader = lib.DataLoader(eval_data, batch_size)
         with torch.no_grad():
             hidden = self.model.init_hidden()
-            for input, target, mask in dataloader:
+            for ii, (input, target, mask) in tqdm(enumerate(dataloader), total=len(dataloader.dataset.df) // dataloader.batch_size, miniters = 1000):
+            #for input, target, mask in dataloader:
                 input = input.to(self.device)
                 target = target.to(self.device)
                 logit, hidden = self.model(input, hidden)

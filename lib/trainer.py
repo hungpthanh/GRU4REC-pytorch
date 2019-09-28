@@ -1,19 +1,21 @@
+import os
 import lib
 import time
 import torch
 import numpy as np
-import os
+from tqdm import tqdm
 
 
 class Trainer(object):
-    def __init__(self, model, train_data, eval_data, optim, use_cuda, loss_func, args):
+    def __init__(self, model, train_data, eval_data, optim, use_cuda, loss_func, batch_size, args):
         self.model = model
         self.train_data = train_data
         self.eval_data = eval_data
         self.optim = optim
         self.loss_func = loss_func
-        self.evaluation = lib.Evaluation(self.model, self.loss_func, use_cuda)
+        self.evaluation = lib.Evaluation(self.model, self.loss_func, use_cuda, k = args.k_eval)
         self.device = torch.device('cuda' if use_cuda else 'cpu')
+        self.batch_size = batch_size
         self.args = args
 
     def train(self, start_epoch, end_epoch, start_time=None):
@@ -24,11 +26,12 @@ class Trainer(object):
 
         for epoch in range(start_epoch, end_epoch + 1):
             st = time.time()
+            print('Start Epoch #', epoch)
             train_loss = self.train_epoch(epoch)
-            loss, recall, mrr = self.evaluation.eval(self.eval_data)
+            loss, recall, mrr = self.evaluation.eval(self.eval_data, self.batch_size)
 
 
-            print("Epoch: {}, loss: {:.2f}, recall: {:.2f}, mrr: {:.2f}, time: {}".format(epoch, loss, recall, mrr, time.time() - st))
+            print("Epoch: {}, train loss: {:.4f}, loss: {:.4f}, recall: {:.4f}, mrr: {:.4f}, time: {}".format(epoch, train_loss, loss, recall, mrr, time.time() - st))
             checkpoint = {
                 'model': self.model,
                 'args': self.args,
@@ -54,8 +57,9 @@ class Trainer(object):
             return hidden
 
         hidden = self.model.init_hidden()
-        dataloader = lib.DataLoader(self.train_data)
-        for input, target, mask in dataloader:
+        dataloader = lib.DataLoader(self.train_data, self.batch_size)
+        #for ii,(data,label) in tqdm(enumerate(train_dataloader),total=len(train_data)):
+        for ii, (input, target, mask) in tqdm(enumerate(dataloader), total=len(dataloader.dataset.df) // dataloader.batch_size, miniters = 1000):
             input = input.to(self.device)
             target = target.to(self.device)
             self.optim.zero_grad()

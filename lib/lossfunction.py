@@ -31,8 +31,6 @@ class SampledCrossEntropyLoss(nn.Module):
     """ CrossEntropyLoss with n_classes = batch_size = the number of samples in the session-parallel mini-batch """
     def __init__(self, use_cuda):
         """
-        See Balazs Hihasi(ICLR 2016), pg.5
-
         Args:
              use_cuda (bool): whether to use cuda or not
         """
@@ -43,16 +41,14 @@ class SampledCrossEntropyLoss(nn.Module):
     def forward(self, logit):
         batch_size = logit.size(1)
         target = Variable(torch.arange(batch_size).long())
-        if self.use_cuda: target = target.cuda()
+        if self.use_cuda:
+            target = target.cuda()
 
         return self.xe_loss(logit, target)
 
 
 class BPRLoss(nn.Module):
     def __init__(self):
-        """
-        See Balazs Hihasi(ICLR 2016), pg.5
-        """
         super(BPRLoss, self).__init__()
 
     def forward(self, logit):
@@ -62,22 +58,16 @@ class BPRLoss(nn.Module):
                          The first dimension corresponds to the batches, and the second
                          dimension corresponds to sampled number of items to evaluate
         """
-
         # differences between the item scores
         diff = logit.diag().view(-1, 1).expand_as(logit) - logit
         # final loss
         loss = -torch.mean(F.logsigmoid(diff))
-
         return loss
 
 
 class BPR_max(nn.Module):
     def __init__(self):
-        """
-        See https://arxiv.org/pdf/1706.03847.pdf, formula (12)
-        """
         super(BPR_max, self).__init__()
-
     def forward(self, logit):
         logit_softmax = F.softmax(logit, dim=1)
         diff = logit.diag().view(-1, 1).expand_as(logit) - logit
@@ -87,11 +77,7 @@ class BPR_max(nn.Module):
 
 class TOP1Loss(nn.Module):
     def __init__(self):
-        """
-        See Balazs Hihasi(ICLR 2016), pg.5
-        """
         super(TOP1Loss, self).__init__()
-
     def forward(self, logit):
         """
         Args:
@@ -99,25 +85,17 @@ class TOP1Loss(nn.Module):
                          The first dimension corresponds to the batches, and the second
                          dimension corresponds to sampled number of items to evaluate
         """
-        # differences between the item scores
         diff = -(logit.diag().view(-1, 1).expand_as(logit) - logit)
-        # final loss
         loss = torch.sigmoid(diff).mean() + torch.sigmoid(logit ** 2).mean()
-
         return loss
 
 
 class TOP1_max(nn.Module):
-
     def __init__(self):
-        """
-        See https://arxiv.org/pdf/1706.03847.pdf, formula (9)
-        """
         super(TOP1_max, self).__init__()
 
     def forward(self, logit):
         logit_softmax = F.softmax(logit, dim=1)
-
         diff = -(logit.diag().view(-1, 1).expand_as(logit) - logit)
         loss = torch.mean(logit_softmax * (torch.sigmoid(diff) + torch.sigmoid(logit ** 2)))
         return loss

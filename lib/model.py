@@ -17,9 +17,7 @@ class GRU4REC(nn.Module):
         self.device = torch.device('cuda' if use_cuda else 'cpu')
         self.onehot_buffer = self.init_emb()
         self.h2o = nn.Linear(hidden_size, output_size)
-
         self.create_final_activation(final_act)
-
         if self.embedding_dim != -1:
             self.look_up = nn.Embedding(input_size, self.embedding_dim)
             self.gru = nn.GRU(self.embedding_dim, self.hidden_size, self.num_layers, dropout=self.dropout_hidden)
@@ -41,8 +39,6 @@ class GRU4REC(nn.Module):
         elif final_act.startswith('leaky-'):
             self.final_activation = nn.LeakyReLU(negative_slope=float(final_act.split('-')[1]))
 
-
-
     def forward(self, input, hidden):
         '''
         Args:
@@ -62,8 +58,8 @@ class GRU4REC(nn.Module):
             embedded = input.unsqueeze(0)
             embedded = self.look_up(embedded)
 
-        output, hidden = self.gru(embedded, hidden) # (num_layer, B, H)
-        output = output.view(-1, output.size(-1))  # (B,H)
+        output, hidden = self.gru(embedded, hidden) #(num_layer, B, H)
+        output = output.view(-1, output.size(-1))  #(B,H)
         logit = self.final_activation(self.h2o(output))
 
         return logit, hidden
@@ -74,38 +70,36 @@ class GRU4REC(nn.Module):
         '''
         onehot_buffer = torch.FloatTensor(self.batch_size, self.output_size)
         onehot_buffer = onehot_buffer.to(self.device)
-
         return onehot_buffer
 
     def onehot_encode(self, input):
         """
         Returns a one-hot vector corresponding to the input
-
         Args:
             input (B,): torch.LongTensor of item indices
             buffer (B,output_size): buffer that stores the one-hot vector
         Returns:
             one_hot (B,C): torch.FloatTensor of one-hot vectors
         """
-
         self.onehot_buffer.zero_()
         index = input.view(-1, 1)
         one_hot = self.onehot_buffer.scatter_(1, index, 1)
-
         return one_hot
 
     def embedding_dropout(self, input):
-        p_drop = torch.Tensor(input.size(0), 1).fill_(1 - self.dropout_input)  # (B,1)
-        mask = torch.bernoulli(p_drop).expand_as(input) / (1 - self.dropout_input)  # (B,C)
+        p_drop = torch.Tensor(input.size(0), 1).fill_(1 - self.dropout_input)
+        mask = torch.bernoulli(p_drop).expand_as(input) / (1 - self.dropout_input)
         mask = mask.to(self.device)
-        input = input * mask  # (B,C)
-
+        input = input * mask
         return input
 
     def init_hidden(self):
         '''
         Initialize the hidden state of the GRU
         '''
-        h0 = torch.zeros(self.num_layers, self.batch_size, self.hidden_size).to(self.device)
-
+        try:
+            h0 = torch.zeros(self.num_layers, self.batch_size, self.hidden_size).to(self.device)
+        except:
+            self.device = 'cpu'
+            h0 = torch.zeros(self.num_layers, self.batch_size, self.hidden_size).to(self.device)
         return h0

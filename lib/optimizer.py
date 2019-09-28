@@ -7,7 +7,6 @@ class Optimizer:
         '''
         An abstract optimizer class for handling various kinds of optimizers.
         You can specify the optimizer type and related parameters as you want.
-
         Usage is exactly the same as an instance of torch.optim
 
         Args:
@@ -19,33 +18,17 @@ class Optimizer:
             eps: eps parameter, if needed.
         '''
         if optimizer_type == 'RMSProp':
-            self.optimizer = optim.RMSprop(params, lr=lr,
-                                           eps=eps,
-                                           weight_decay=weight_decay,
-                                           momentum=momentum)
+            self.optimizer = optim.RMSprop(params, lr=lr, eps=eps, weight_decay=weight_decay, momentum=momentum)
         elif optimizer_type == 'Adagrad':
-            self.optimizer = optim.Adagrad(params, lr=lr,
-                                           weight_decay=weight_decay)
+            self.optimizer = optim.Adagrad(params, lr=lr, weight_decay=weight_decay)
         elif optimizer_type == 'Adadelta':
-            self.optimizer = optim.Adadelta(params,
-                                            lr=lr,
-                                            eps=eps,
-                                            weight_decay=weight_decay)
+            self.optimizer = optim.Adadelta(params, lr=lr, eps=eps, weight_decay=weight_decay)
         elif optimizer_type == 'Adam':
-            self.optimizer = optim.Adam(params,
-                                        lr=lr,
-                                        eps=eps,
-                                        weight_decay=weight_decay)
-
+            self.optimizer = optim.Adam(params, lr=lr, eps=eps, weight_decay=weight_decay)
         elif optimizer_type == 'SparseAdam':
-            self.optimizer = optim.SparseAdam(params,
-                                              lr=lr,
-                                              eps=eps)
+            self.optimizer = optim.SparseAdam(params, lr=lr, eps=eps)
         elif optimizer_type == 'SGD':
-            self.optimizer = optim.SGD(params,
-                                       lr=lr,
-                                       momentum=momentum,
-                                       weight_decay=weight_decay)
+            self.optimizer = optim.SGD(params, lr=lr, momentum=momentum, weight_decay=weight_decay)
         else:
             raise NotImplementedError
 
