@@ -33,6 +33,6 @@ class Evaluation(object):
                 mrrs.append(mrr)
         mean_losses = np.mean(losses)
         mean_recall = np.mean(recalls)
-        mean_mrr = np.mean(mrrs)
+        mean_mrr = torch.Tensor.mean(mrrs)
 
         return mean_losses, mean_recall, mean_mrr
